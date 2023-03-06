@@ -3,6 +3,7 @@ import { Container, Form } from "react-bootstrap"
 import { useState, useEffect} from "react"
 import SpotifyWebApi from "spotify-web-api-node"
 import TrackSearchResult from "./TrackSearchResult"
+import Player from "./Player"
 
 const spotifyApi = new SpotifyWebApi({
     clientId: "0f1031b22d464246bd89f46eea042924",
@@ -12,8 +13,14 @@ const spotifyApi = new SpotifyWebApi({
 export default function Dashboard({code}){
     const [search, setSearch] = useState("")
     const [searchResults, setSearchResults] = useState([])
+    const [playingTrack, setPlayingTrack] = useState()
 
     const accessToken = Auth(code)
+
+    function chooseTrack(track){
+        setPlayingTrack(track)
+        setSearch("")
+    }
 
     useEffect(() => {
         if (!accessToken) return
@@ -48,17 +55,18 @@ export default function Dashboard({code}){
    return (<>
     
     <Container className='d-flex flex-column py-2' style={{height: "100vh"}}>
-        {code}
+        
         <Form.Control type='search' placeholder='Search songs' value={search} onChange={e => setSearch(e.target.value)}></Form.Control>
         <div className='flex-grow-1 my-2' style={{overflowY: "auto"}}>
             {searchResults.map(track => (
-                <TrackSearchResult track={track} key={track.uri}/>
+                <TrackSearchResult track={track} key={track.uri} chooseTrack={chooseTrack}/>
              
             ))}
         </div>
         <div>
             Bottom
         </div>
+        <div><Player accessToken={accessToken} trackUri={playingTrack?.uri}/></div>
     </Container>
 
     </>)
