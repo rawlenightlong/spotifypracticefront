@@ -10,6 +10,7 @@ const spotifyApi = new SpotifyWebApi({
     clientSecret: "02c3a81043954e3f90acd488e5cb66c1"
 })
 
+
 export default function Dashboard({code}){
     const [search, setSearch] = useState("")
     const [searchResults, setSearchResults] = useState([])
@@ -53,7 +54,7 @@ export default function Dashboard({code}){
     }, [search, accessToken])
    
    return (<>
-    
+<div>
     <Container className='d-flex flex-column py-2' style={{height: "100vh"}}>
         
         <Form.Control type='search' placeholder='Search songs' value={search} onChange={e => setSearch(e.target.value)}></Form.Control>
@@ -68,6 +69,6 @@ export default function Dashboard({code}){
         </div>
         <div><Player accessToken={accessToken} trackUri={playingTrack?.uri}/></div>
     </Container>
-
+    </div>
     </>)
 }
