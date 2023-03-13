@@ -4,6 +4,8 @@ import { useState, useEffect} from "react"
 import SpotifyWebApi from "spotify-web-api-node"
 import TrackSearchResult from "./TrackSearchResult"
 import Player from "./Player"
+import Playlist from "./Playlist"
+import axios from "axios"
 
 const spotifyApi = new SpotifyWebApi({
     clientId: "0f1031b22d464246bd89f46eea042924",
@@ -15,13 +17,61 @@ export default function Dashboard({code}){
     const [search, setSearch] = useState("")
     const [searchResults, setSearchResults] = useState([])
     const [playingTrack, setPlayingTrack] = useState()
+    const [currentUser, setCurrentUser] = useState(null)
 
     const accessToken = Auth(code)
+ 
+    // async function fetchUser(){
+            
+    //         await  fetch("https://api.spotify.com/v1/me", {
+    //             headers: { "Authorization": `Bearer ${accessToken}`}
+    //         })
+    //         .then(response => response.json())
+    //         .then(data => {
+    //             setCurrentUser(data)
+    //             console.log(currentUser)
+    //         })
+    // }
+
+  
+
+    async function fetchUser(){
+        if (!accessToken) return
+        let response = await fetch("https://api.spotify.com/v1/me", {
+            headers: {"Authorization": `Bearer ${accessToken}`}
+        })
+        let data = await response.json()
+        setCurrentUser(data.display_name)
+        console.log(currentUser)
+    }
+
+    useEffect(() => {fetchUser()}, [accessToken, currentUser])
 
     function chooseTrack(track){
         setPlayingTrack(track)
         setSearch("")
     }
+
+    function addSong(){
+        axios.post("https://rawlifyplaylist.onrender.com/spotsongs", {
+            username: currentUser,
+            title: playingTrack.name,
+            artist: playingTrack.artist,
+            url: playingTrack.uri
+        })
+    }
+
+
+
+    const [playlist, setPlaylist] = useState(null)
+
+    useEffect( () => {
+        fetch("https://rawlifyplaylist.onrender.com/spotsongs")
+        .then((response) => response.json())
+        .then(data => {
+            setPlaylist(data)
+        })
+    }, [])
 
     useEffect(() => {
         if (!accessToken) return
@@ -53,9 +103,19 @@ export default function Dashboard({code}){
         return () => cancel = true
     }, [search, accessToken])
    
+    const playlistLoaded = () => {
+        return  <div className="playlist"><Playlist playlist={playlist}/></div>
+    }
+
+    const playlistLoading = () => {
+        return <div>Loading...</div>
+    }
+
+
    return (<>
-<div>
-    <Container className='d-flex flex-column py-2' style={{height: "100vh"}}>
+<div className="d-flex">
+{playlist ? playlistLoaded() : playlistLoading()}
+    <Container className='d-flex flex-column my-5 py-2 bg-blue' style={{height: "60vh", width: "50%", backgroundColor: "lightblue"}}>
         
         <Form.Control type='search' placeholder='Search songs' value={search} onChange={e => setSearch(e.target.value)}></Form.Control>
         <div className='flex-grow-1 my-2' style={{overflowY: "auto"}}>
