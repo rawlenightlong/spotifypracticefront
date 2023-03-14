@@ -18,6 +18,7 @@ export default function Dashboard({code}){
     const [searchResults, setSearchResults] = useState([])
     const [playingTrack, setPlayingTrack] = useState()
     const [currentUser, setCurrentUser] = useState(null)
+    const [song, setSong] = useState(null)
 
     const accessToken = Auth(code)
  
@@ -33,7 +34,7 @@ export default function Dashboard({code}){
     //         })
     // }
 
-  
+
 
     async function fetchUser(){
         if (!accessToken) return
@@ -52,15 +53,25 @@ export default function Dashboard({code}){
         setSearch("")
     }
 
-    function addSong(){
+
+    async function addSong(){
+        
+        // await playlist.map((track => {
+        //     if (track.username === currentUser)
+        //     {
+        //         return alert("Song already in playlist!")
+                
+        //     }
+        // }))
+
         axios.post("https://rawlifyplaylist.onrender.com/spotsongs", {
             username: currentUser,
-            title: playingTrack.name,
+            title: playingTrack.title,
             artist: playingTrack.artist,
             url: playingTrack.uri
         })
+        console.log("Song added")
     }
-
 
 
     const [playlist, setPlaylist] = useState(null)
@@ -71,7 +82,7 @@ export default function Dashboard({code}){
         .then(data => {
             setPlaylist(data)
         })
-    }, [])
+    }, [playlist])
 
     useEffect(() => {
         if (!accessToken) return
@@ -104,7 +115,7 @@ export default function Dashboard({code}){
     }, [search, accessToken])
    
     const playlistLoaded = () => {
-        return  <div className="playlist"><Playlist playlist={playlist}/></div>
+        return  <div className="playlist"><Playlist playlist={playlist} user={currentUser} addSong={addSong} setSong={setSong} chooseTrack={chooseTrack}/></div>
     }
 
     const playlistLoading = () => {
@@ -114,6 +125,7 @@ export default function Dashboard({code}){
 
    return (<>
 <div className="d-flex">
+
 {playlist ? playlistLoaded() : playlistLoading()}
     <Container className='d-flex flex-column my-5 py-2 bg-blue' style={{height: "60vh", width: "50%", backgroundColor: "lightblue"}}>
         
@@ -127,7 +139,7 @@ export default function Dashboard({code}){
         <div>
             Bottom
         </div>
-        <div><Player accessToken={accessToken} trackUri={playingTrack?.uri}/></div>
+        <div><Player accessToken={accessToken} trackUri={playingTrack?.uri} songUrl={song?.url}/></div>
     </Container>
     </div>
     </>)
