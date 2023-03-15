@@ -4,7 +4,7 @@ async function deleteSong(song){
 }
 
 
-export default function Playlist({playlist, addSong, playingTrack, setSong, user}){
+export default function Playlist({playlist, addSong, setPlayingTrack, setSong, user, showEdit, setShowEdit, setSongInfo}){
 
 
     return (<>
@@ -29,10 +29,20 @@ export default function Playlist({playlist, addSong, playingTrack, setSong, user
         <button className="m-1" onClick={
             () => {
                 setSong(song)
-                
+                setPlayingTrack("")
                 }} >Play</button>
 
         <button onClick={() => {deleteSong(song)}}>Delete</button>
+        <button className="m-1" onClick={
+            () => {
+                setSongInfo(song)
+                if (showEdit === true){
+                    setShowEdit(false)
+                }else{
+                    setShowEdit(true)
+                }
+            }
+        }>Show/Edit</button>
         </div>
         </>)
       

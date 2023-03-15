@@ -6,6 +6,7 @@ import TrackSearchResult from "./TrackSearchResult"
 import Player from "./Player"
 import Playlist from "./Playlist"
 import axios from "axios"
+import ShowEditPage from "./ShowEditPage"
 
 const spotifyApi = new SpotifyWebApi({
     clientId: "0f1031b22d464246bd89f46eea042924",
@@ -19,6 +20,10 @@ export default function Dashboard({code}){
     const [playingTrack, setPlayingTrack] = useState()
     const [currentUser, setCurrentUser] = useState(null)
     const [song, setSong] = useState(null)
+    const [showEdit, setShowEdit] = useState(false)
+    const [play, setPlay] = useState(false)
+    const [songInfo, setSongInfo] = useState(null)
+    const [showPlayer, setShowPlayer] = useState(false)
 
     const accessToken = Auth(code)
  
@@ -74,6 +79,8 @@ export default function Dashboard({code}){
     }
 
 
+
+
     const [playlist, setPlaylist] = useState(null)
 
     useEffect( () => {
@@ -115,18 +122,34 @@ export default function Dashboard({code}){
     }, [search, accessToken])
    
     const playlistLoaded = () => {
-        return  <div className="playlist"><Playlist playlist={playlist} user={currentUser} addSong={addSong} setSong={setSong} chooseTrack={chooseTrack}/></div>
+        return  <div className="playlist"><Playlist playlist={playlist} user={currentUser} addSong={addSong} setPlayingTrack={setPlayingTrack} setSongInfo={setSongInfo} setSong={setSong} chooseTrack={chooseTrack} showEdit={showEdit}setShowEdit={setShowEdit}/></div>
     }
 
     const playlistLoading = () => {
         return <div>Loading...</div>
     }
 
+    const showEditPage = () => {
+        return <ShowEditPage setShowEdit={setShowEdit} songInfo={songInfo} setPlay={setPlay}/>
+    }
+
+    const hideEditPage = () => {
+        return null
+    }
+
+    const renderPlayer = () => {
+        return <div><Player accessToken={accessToken} trackUri={playingTrack?.uri} songUrl={song?.url ? song.url : null} play={play} setPlay={setPlay}/></div>
+    }
+
+
+
 
    return (<>
 <div className="d-flex">
 
 {playlist ? playlistLoaded() : playlistLoading()}
+{showEdit ? showEditPage() : hideEditPage()}
+
     <Container className='d-flex flex-column my-5 py-2 bg-blue' style={{height: "60vh", width: "50%", backgroundColor: "lightblue"}}>
         
         <Form.Control type='search' placeholder='Search songs' value={search} onChange={e => setSearch(e.target.value)}></Form.Control>
@@ -139,7 +162,8 @@ export default function Dashboard({code}){
         <div>
             Bottom
         </div>
-        <div><Player accessToken={accessToken} trackUri={playingTrack?.uri} songUrl={song?.url}/></div>
+        {playingTrack || song ? renderPlayer() : null }
+        {/* <div><Player accessToken={accessToken} trackUri={playingTrack?.uri} songUrl={song?.url ? song.url : null} play={play} setPlay={setPlay}/></div> */}
     </Container>
     </div>
     </>)
