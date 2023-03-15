@@ -23,7 +23,7 @@ export default function Dashboard({code}){
     const [showEdit, setShowEdit] = useState(false)
     const [play, setPlay] = useState(false)
     const [songInfo, setSongInfo] = useState(null)
-    const [showPlayer, setShowPlayer] = useState(false)
+
 
     const accessToken = Auth(code)
  
@@ -122,7 +122,7 @@ export default function Dashboard({code}){
     }, [search, accessToken])
    
     const playlistLoaded = () => {
-        return  <div className="playlist"><Playlist playlist={playlist} user={currentUser} addSong={addSong} setPlayingTrack={setPlayingTrack} setSongInfo={setSongInfo} setSong={setSong} chooseTrack={chooseTrack} showEdit={showEdit}setShowEdit={setShowEdit}/></div>
+        return  <div className="playlist"><Playlist playlist={playlist} user={currentUser} addSong={addSong} setPlayingTrack={setPlayingTrack} setSongInfo={setSongInfo} setSong={setSong} chooseTrack={chooseTrack} showEdit={showEdit}setShowEdit={setShowEdit} setPlay={setPlay}/></div>
     }
 
     const playlistLoading = () => {
